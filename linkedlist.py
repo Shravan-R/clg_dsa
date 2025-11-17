@@ -17,6 +17,6 @@ class LinkedList:
             temp=temp.next
         print("->".join(nodes))
 
-    def 
+
 
 
