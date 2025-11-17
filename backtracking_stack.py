@@ -1,3 +1,5 @@
+# rules is just going right and left or up not down if u come down then it is a back tracking program
+
 def solve_maze(maze, start, end):
     path_stack = []
     visited = set()
