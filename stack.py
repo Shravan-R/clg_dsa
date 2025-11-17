@@ -1,6 +1,6 @@
 class TextEditor:
 
-    def init(self, initial_text=""):
+    def __init__(self, initial_text=""):
         self._text = initial_text
         self.undo_stack = []
         self.redo_stack = []
@@ -9,10 +9,7 @@ class TextEditor:
         return self._text
 
     def _apply_insert(self, pos, text):
-        if pos < 0:
-            pos = 0
-        if pos > len(self._text):
-            pos = len(self._text)
+        pos = max(0, min(pos, len(self._text)))
         self._text = self._text[:pos] + text + self._text[pos:]
 
     def _apply_delete(self, pos, length):
@@ -45,24 +42,33 @@ class TextEditor:
         if not self.undo_stack:
             return False
         typ, pos, data = self.undo_stack.pop()
+
         if typ == 'insert':
+            # Undo a delete by reinserting text
             self._apply_insert(pos, data)
             self.redo_stack.append(('delete', pos, data))
+
         elif typ == 'delete':
+            # Undo an insert by deleting text
             removed = self._apply_delete(pos, len(data))
             self.redo_stack.append(('insert', pos, removed))
+
         return True
 
     def redo(self):
         if not self.redo_stack:
             return False
+
         typ, pos, data = self.redo_stack.pop()
+
         if typ == 'insert':
             self._apply_insert(pos, data)
             self.undo_stack.append(('delete', pos, data))
+
         elif typ == 'delete':
             removed = self._apply_delete(pos, len(data))
             self.undo_stack.append(('insert', pos, removed))
+
         return True
 
     def debug_stacks(self):
@@ -72,7 +78,7 @@ class TextEditor:
         }
 
 
-if name == "main":
+if __name__ == "__main__":
     ed = TextEditor()
     ed.append("Hello")
     ed.append(", world")
